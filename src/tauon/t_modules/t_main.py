@@ -5760,7 +5760,15 @@ class ThumbTracks:
 		if source is False:  # No art
 			return None
 
-		image_name = track.album + track.parent_folder_path + str(offset)
+		source_type, source_location = source
+		source_mtime = ""
+		if source_type in (0, 1):
+			try:
+				source_mtime = str(os.path.getmtime(source_location))
+			except OSError:
+				source_mtime = str(track.modified_time)
+
+		image_name = f"{source_type}:{source_location}:{offset}:{source_mtime}"
 		image_name = hashlib.md5(image_name.encode("utf-8", "replace")).hexdigest()  # noqa: S324 - not a security hash
 
 		t_path = self.tauon.e_cache_directory / f"{image_name}.jpg"
